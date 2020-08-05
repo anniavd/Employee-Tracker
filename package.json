@@ -1,0 +1,24 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "app  to be able to view and manage the departments, roles, and employees in a  company",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anniavd/Employee-Tracker.git"
+  },
+  "author": "annia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anniavd/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/anniavd/Employee-Tracker#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.3.3",
+    "mysql2": "^2.1.0"
+  }
+}
