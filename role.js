@@ -10,8 +10,10 @@ class Role {
    // show all the role info in a table
     showRoles() {
         //sql consult select
-        db.query(`SELECT * FROM role`, (err, res) => {
-            if (err) throw err;
+        db.query(`SELECT role.title AS job_title,role.id,department.name AS department_name,role.salary  FROM  role LEFT JOIN department ON role.department_id=department.id`,
+         (err, res) => {
+
+                if (err) throw err;
     
             if (res.length > 0) {
                
