@@ -70,10 +70,12 @@ class Employee {
         }
         ])
             .then(anserw => {
+                //taking the value entry for the prompt
                 let name = anserw.name;
                 let last=anserw.lastName;
                 let roleIdEmp=anserw.roleId;
-                let managerId=anserw.magId;
+                //manager id can be null to
+                let managerId=anserw.magId || null;
                 db.query('INSERT INTO employee SET first_name=?,last_name=?,role_id=?,manager_id=? ',[name,last,roleIdEmp,managerId], (err, res) => {
                     if (err) throw err;                   
                     console.log(res.affectedRows + ' employee inserted!\n');
