@@ -11,7 +11,8 @@ class Employee {
     //show employee info in a table
     showEmployees() {
         //sql consult select
-        db.query(`SELECT * FROM employee`, (err, res) => {
+        db.query(`SELECT employee.id, employee.first_name,employee.last_name,
+        role.title AS job_title,role.salary FROM  employee LEFT JOIN role ON employee.role_id=role.id`, (err, res) => {
             if (err) throw err;
     
             if (res.length > 0) {
