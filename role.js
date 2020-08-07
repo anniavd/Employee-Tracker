@@ -7,8 +7,9 @@ class Role {
     constructor() {
 
     }
-
+   // show all the role info in a table
     showRoles() {
+        //sql consult select
         db.query(`SELECT * FROM role`, (err, res) => {
             if (err) throw err;
     
@@ -19,6 +20,7 @@ class Role {
         });    
     }
 
+    // add a role info to the date base
     addRole() {
         inquirer.prompt([
            
@@ -66,12 +68,43 @@ class Role {
                 let title = anserw.title;
                 let salary=anserw.salary;
                 let id=anserw.dptoId;
+
+                //sql consult insert a role
                 db.query('INSERT INTO role SET title=?,salary=?,department_id=? ', [title,salary,id], (err, res) => {
                     if (err) throw err;                   
                     console.log(res.affectedRows + ' role inserted!\n');
                 })
             })
     }
+
+    // delete a role from the table 
+    deleteRole() {
+    inquirer.prompt([
+
+        {
+            type: 'input',
+            name: 'roleId',
+            message: 'What is the role id ?',
+            validate: idInput => {           //validation the entry
+                if (idInput) {
+                    return true;
+                } else {
+                    console.log('\n Please enter a role id!');
+                    return false;
+                }
+            }
+        }
+    ])
+        .then(anserw => {
+            let deleteId = anserw.roleId;
+            //sql consult delete 
+            db.query('DELETE FROM role WHERE id=? ', [deleteId], (err, res) => {
+                if (err) throw err;
+                
+                console.log(res.affectedRows + ' role delete!\n');
+            })
+        })
+}
 
 
 

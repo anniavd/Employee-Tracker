@@ -36,6 +36,7 @@ function showOptions() {
         dept.addDepartment();
         break;
       case 'Delete a Department':
+        dept.deleteApartment();
         break;
       case 'View all the Role':  
       role.showRoles();     
@@ -44,6 +45,7 @@ function showOptions() {
        role.addRole();      
         break;
       case'Delete a Role':
+      role.deleteRole(); 
         break;
       case 'View all the Employee':
         employee.showEmployees();
@@ -52,6 +54,7 @@ function showOptions() {
         employee.addEmployee();
         break;
       case 'Delete a Employee':
+        employee.deleteEmployee();
         break;
       case 'Update a employee role':
         break;

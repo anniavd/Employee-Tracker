@@ -8,8 +8,9 @@ class Employee {
     constructor() {
 
     }
-
+    //show employee info in a table
     showEmployees() {
+        //sql consult select
         db.query(`SELECT * FROM employee`, (err, res) => {
             if (err) throw err;
     
@@ -19,7 +20,7 @@ class Employee {
             }    
         });    
     }
-
+  //add a employe to the date base
    addEmployee () {
         inquirer.prompt([
             
@@ -76,12 +77,45 @@ class Employee {
                 let roleIdEmp=anserw.roleId;
                 //manager id can be null to
                 let managerId=anserw.magId || null;
+
+                //sql consult insert  a employee
                 db.query('INSERT INTO employee SET first_name=?,last_name=?,role_id=?,manager_id=? ',[name,last,roleIdEmp,managerId], (err, res) => {
                     if (err) throw err;                   
                     console.log(res.affectedRows + ' employee inserted!\n');
                 })
             })
     }
+
+    //delete a employee info from a table used a id
+    deleteEmployee() {
+
+        inquirer.prompt([
+    
+            {
+                type: 'input',
+                name: 'empId',
+                message: 'What is the employee id ?',
+                validate: idInput => {           //validation the entry
+                    if (idInput) {
+                        return true;
+                    } else {
+                        console.log('\n Please enter a employee id!');
+                        return false;
+                    }
+                }
+            }
+        ])
+            .then(anserw => {
+                let deleteId = anserw.empId;
+                //sql consult delete employee
+                db.query('DELETE FROM employee WHERE id=? ', [deleteId], (err, res) => {
+                    if (err) throw err;
+                    
+                    console.log(res.affectedRows + ' employee delete!\n');
+                })
+            })
+    }
+     
 
 
 
