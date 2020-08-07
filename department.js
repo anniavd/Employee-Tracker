@@ -17,10 +17,8 @@ class Department {
             if (res.length > 0) {
                
                 console.table(res);
-            }
-    
-        });
-    
+            }    
+        });    
     }
 
     addDepartment() {
@@ -44,13 +42,17 @@ class Department {
                 let nameDepartment = anserw.nameDpto;
                 db.query('INSERT INTO department SET name=? ', [nameDepartment], (err, res) => {
                     if (err) throw err;
-                    if (res.afectedRows > 0) {
+                   /* if (res.afectedRows > 0) {
                         console.log("succesfully insert")
-                    }
+                    }*/
+                    console.log(res.affectedRows + ' department inserted!\n');
                 })
             })
     }
 
+
+
+    
 }
 
 module.exports = new Department();
