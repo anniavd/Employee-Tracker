@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const dept = require('./department');
 const role=require('./role');
+const employee=require('./employee')
 const db = require('./db/database');
 
 function showOptions() {
@@ -45,8 +46,10 @@ function showOptions() {
       case'Delete a Role':
         break;
       case 'View all the Employee':
+        employee.showEmployees();
         break;
       case 'Add a Employee':
+        employee.addEmployee();
         break;
       case 'Delete a Employee':
         break;
