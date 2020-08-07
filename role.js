@@ -21,16 +21,16 @@ class Role {
 
     addRole() {
         inquirer.prompt([
-            //manager name
+           
             {
                 type: 'input',
                 name: 'title',
-                message: 'What is your deparment name?',
+                message: 'What is your title rol?',
                 validate: name => {           //validation the entry
                     if (name) {
                         return true;
                     } else {
-                        console.log('\n Please enter team manager’s name!');
+                        console.log('\n Please enter a title rol!');
                         return false;
                     }
                 }
@@ -39,8 +39,8 @@ class Role {
                 type: 'input',
                 name: 'salary',
                 message: 'What is the salary rol?',
-                validate: name => {           //validation the entry
-                    if (name) {
+                validate: salaryInput => {           //validation the entry
+                    if (salaryInput) {
                         return true;
                     } else {
                         console.log('\n Please enter a salary rol!');

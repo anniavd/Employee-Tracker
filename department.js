@@ -23,16 +23,16 @@ class Department {
 
     addDepartment() {
         inquirer.prompt([
-            //manager name
+         
             {
                 type: 'input',
                 name: 'nameDpto',
-                message: 'What is your deparment name?',
+                message: 'What is your department name?',
                 validate: name => {           //validation the entry
                     if (name) {
                         return true;
                     } else {
-                        console.log('\n Please enter team manager’s name!');
+                        console.log('\n Please enter a department name!');
                         return false;
                     }
                 }
