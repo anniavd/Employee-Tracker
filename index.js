@@ -1,9 +1,10 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+//arrays for show the info on the prompt for select choices
 let deptoChoice = [];
 let roleChoice = [];
-let employeName=[];
+let employeName = [];
 
 
 
@@ -26,7 +27,7 @@ connection.connect(err => {
 
 
 
-
+// show the questions 
 function menu() {
   console.log("\n** Select options **\n");
 
@@ -97,10 +98,11 @@ function showDepartments() {
 
     if (res.length > 0) {
       console.log('\n')
-      console.log('Departments')
+      console.log(' ** Departments **')
       console.log('\n')
       console.table(res);
     }
+    //call the menu for show a question again
     menu();
   });
 
@@ -115,28 +117,30 @@ function showRoles() {
 
       if (res.length > 0) {
         console.log('\n')
-        console.log('Roles')
+        console.log(' ** Roles **')
         console.log('\n')
         console.table(res);
       }
+      //call the menu for show a question again
       menu();
     });
 }
 // show all the employee info
 function showEmployees() {
-  //sql consult select
+  //query consult select
   connection.query(`SELECT employee.id, employee.first_name,employee.last_name,role.title AS job_title,role.salary,
        CONCAT(manager.first_name ," ", manager.last_name) AS Manager FROM  employee LEFT JOIN role ON employee.role_id=role.id LEFT JOIN employee  manager ON manager.id = employee.manager_id`, (err, res) => {
-   // console.log(res);
+    // console.log(res);
 
     if (err) throw err;
 
     if (res.length > 0) {
       console.log('\n')
-      console.log('Employees')
+      console.log('** Employees **')
       console.log('\n')
       console.table(res);
     }
+    //call the menu for show a question again
     menu();
   });
 
@@ -169,7 +173,10 @@ function addDepartment() {
       connection.query('INSERT INTO department SET name=? ', [nameDepartment], (err, res) => {
         if (err) throw err;
 
+        //print the info tell the user 1 department was inserted
         console.log(res.affectedRows + ' department inserted!\n');
+
+        //call the menu for show a question again
         menu();
       })
     })
@@ -205,12 +212,14 @@ function deleteApartment() {
     })
 }
 
+//select all from department table and back a object array
 function helperArray() {
   connection.query(`SELECT * FROM department `, (err, res) => {
 
-    if (err) throw err;   
+    if (err) throw err;
     res.forEach(dpto => {
-      deptoChoice.push({ name:dpto.name, value: dpto.id })
+
+      deptoChoice.push({ name: dpto.name, value: dpto.id })
     })
     console.log('metodo', deptoChoice)
     return deptoChoice;
@@ -271,77 +280,99 @@ function addRole() {
     })
 }
 
-
-
-
+//select title and  id from role table and back a object array
 function helperEmployee() {
- connection.query(`SELECT role.title,role.id FROM role `, (err, res) => {
+  connection.query(`SELECT role.title,role.id FROM role `, (err, res) => {
 
-      if (err) throw err;     
-      res.forEach(roles => {
-        roleChoice.push({name:roles.title,value:roles.id})
-      })
-      console.log('titulo y id',roleChoice)
-      return roleChoice;
+    if (err) throw err;
+    res.forEach(roles => {
+      roleChoice.push({ name: roles.title, value: roles.id })
+    })
+   // console.log('titulo y id', roleChoice)
+    return roleChoice;
+  });
+}
+
+function helperEmpManager() {
+  connection.query(`SELECT  CONCAT(employee.first_name," " ,employee.last_name) AS fullName, employee.id FROM employee`, (err, res) => {
+    //CONCAT(manager.first_name ," ", manager.last_name)
+    if (err) throw err;
+    res.forEach(emp => {
+      employeName.push({ name:emp.fullName, value:emp.id})
+    })
+    console.log('employee names', employeName)
+    return employeName;
   });
 }
 
 //add a employe to the date base
 function addEmployee() {
   helperEmployee();
+  helperEmpManager();
   inquirer.prompt([
 
-      {
-          type: 'input',
-          name: 'name',
-          message: 'What is the employee\manager name?',
-          validate: name => {           //validation the entry
-              if (name) {
-                  return true;
-              } else {
-                  console.log('\n Please enter the name!');
-                  return false;
-              }
-          }
-      },
-      {
-          type: 'input',
-          name: 'lastName',
-          message: 'What is the employee\ manager last name?',
-          validate: lastnameInput => {           //validation the entry
-              if (lastnameInput) {
-                  return true;
-              } else {
-                  console.log('\n Please enter the last name!');
-                  return false;
-              }
-          }
-      },
-      {
-          type: 'list',
-          name: 'selectRole',
-          message: 'Select a role for a employee',
-          choices: roleChoice
-      },
-      {
-          type: 'input',
-          name: 'magId',
-          message: 'What is the manager id?'
-
+    {
+      type: 'input',
+      name: 'name',
+      message: 'What is the employee\ manager name?',
+      validate: name => {           //validation the entry
+        if (name) {
+          return true;
+        } else {
+          console.log('\n Please enter the name!');
+          return false;
+        }
       }
-  ])
-      .then(anserw => {
-          //taking the value entry for the prompt
-          let name = anserw.name;
-          let last = anserw.lastName;
-          let roleIdEmp = anserw.selectRole;
-          //manager id can be null to
-          let managerId = anserw.magId || null;
+    },
+    {
+      type: 'input',
+      name: 'lastName',
+      message: 'What is the employee\ manager last name?',
+      validate: lastnameInput => {           //validation the entry
+        if (lastnameInput) {
+          return true;
+        } else {
+          console.log('\n Please enter the last name!');
+          return false;
+        }
+      }
+    },
+    {
+      type: 'list',
+      name: 'selectRole',
+      message: 'Select a role for a employee',
+      choices: roleChoice
+    },
+    // Table of Contents
+    {
+      type: 'confirm',
+      name: 'confirmManager',
+      message: 'Have a manager?',
+      default: false,
+    },
 
-          //sql consult insert  a employee
-          connection.query('INSERT INTO employee SET first_name=?,last_name=?,role_id=?,manager_id=? ', [name, last, roleIdEmp, managerId], (err, res) => {
-              if (err) throw err;
-              console.log(res.affectedRows + ' employee inserted!\n');
-          })
+    {
+      type: 'list',
+      name: 'magId',
+      message: 'Have a manager?',
+      choices: employeName,
+     when: ({ confirmManager }) => confirmManager
+    }  
+
+  ])
+    .then(anserw => {
+      //taking the value entry for the prompt
+      let name = anserw.name;
+      let last = anserw.lastName;
+      let roleIdEmp = anserw.selectRole;
+      //manager id can be null to
+      let managerId = anserw.magId || null;
+
+      //sql consult insert  a employee
+      connection.query('INSERT INTO employee SET first_name=?,last_name=?,role_id=?,manager_id=? ', [name, last, roleIdEmp, managerId], (err, res) => {
+        if (err) throw err;
+        console.log(res.affectedRows + ' employee inserted!\n');
+        menu();
       })
+    })
 }
