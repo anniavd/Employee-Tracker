@@ -65,5 +65,4 @@ function showOptions() {
   
 }
 
-
-showOptions();
+module.exports=showOptions();
