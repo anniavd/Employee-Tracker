@@ -41,10 +41,12 @@ function menu() {
         'View all the Departments',
         'Add a Department',
         'Delete a Department',
-        'View all the Role',
+        'View all the Roles',
         'Add a Role',
+        'Delete a Role',
         'View all the Employee',
         'Add a Employee',
+        'Delete a Employee',
         'Update a Employee role',
         `Update a Employee manager's name`,
         'Quit'
@@ -62,11 +64,14 @@ function menu() {
       case 'Delete a Department':
         deleteApartment();
         break;
-      case 'View all the Role':
+      case 'View all the Roles':
         showRoles();
         break;
       case 'Add a Role':
         addRole();
+        break;
+      case 'Delete a Role':
+        deleteRole();
         break;
       case 'View all the Employee':
         showEmployees();
@@ -74,10 +79,13 @@ function menu() {
       case 'Add a Employee':
         addEmployee();
         break;
-      case 'Update a employee role':
+      case 'Delete a Employee':
+        deleteEmployee();
+        break;
+      case 'Update a Employee role':
         updateEmployeeRole();
         break;
-      case 'Update a employee manager name':
+      case `Update a Employee manager's name`:
         updateEmpManager()
         break;
       default:
@@ -221,6 +229,32 @@ function addDepartment() {
 
 }
 
+//Delete department
+async function deleteApartment() {
+  //return a list department names
+  let roleNames = await helperArray();
+  inquirer.prompt([
+
+    {
+      type: 'list',
+      name: 'dptoDelete',
+      message: 'Select the department for delete!',
+      choices: roleNames
+
+    }
+  ])
+    .then(anserw => {
+      let deleteId = anserw.dptoDelete;
+      //sql consult delete
+      connection.query('DELETE FROM department WHERE id=? ', [deleteId], (err, res) => {
+        if (err) throw err;
+
+        console.log(res.affectedRows + ' department delete!\n');
+        menu();
+      })
+    })
+}
+
 // add a role info to the date base
 async function addRole() {
   //the function back a array with all the departments name
@@ -272,6 +306,32 @@ async function addRole() {
       connection.query('INSERT INTO role SET title=?,salary=?,department_id=? ', [title, salary, id], (err, res) => {
         if (err) throw err;
         console.log(res.affectedRows + ' role inserted!\n');
+        menu();
+      })
+    })
+}
+
+// delete a role from the table 
+async function deleteRole() {
+  let rolesName = await helperEmployee();
+  inquirer.prompt([
+
+    {
+      type: 'list',
+      name: 'roleDelete',
+      message: 'Select a role for delete!',
+      choices: rolesName
+
+    }
+
+  ])
+    .then(anserw => {
+      let deleteId = anserw.roleDelete;
+      //sql consult delete 
+      connection.query('DELETE FROM role WHERE id=? ', [deleteId], (err, res) => {
+        if (err) throw err;
+
+        console.log(res.affectedRows + 'A role was delete!\n');
         menu();
       })
     })
@@ -352,6 +412,33 @@ async function addEmployee() {
     })
 }
 
+//delete a employee info from a table used a id
+async function deleteEmployee() {
+
+  let employees = await helperEmpManager();
+  inquirer.prompt([
+
+    {
+      type: 'list',
+      name: 'empDelete',
+      message: 'Select a role for delete!',
+      choices: employees
+
+    }
+
+  ])
+    .then(anserw => {
+      let deleteId = anserw.empDelete;
+      //sql consult delete employee
+      connection.query('DELETE FROM employee WHERE id=? ', [deleteId], (err, res) => {
+        if (err) throw err;
+
+        console.log(res.affectedRows + ' Employee deleted!\n');
+      })
+    })
+}
+
+
 //update employee role
 async function updateEmployeeRole() {
   //call the functions back a employee names,id and roles names,id
@@ -431,27 +518,3 @@ async function updateEmpManager() {
     })
 }
 
-async function deleteApartment() {
-  //return a list department names
-  let roleNames = await helperArray();
-  inquirer.prompt([
-
-    {
-      type: 'list',
-      name: 'dptoDelete',
-      message: 'Select the department for delete!',
-      choices: roleNames
-
-    }
-  ])
-    .then(anserw => {
-      let deleteId = anserw.dptoDelete;
-      //sql consult delete
-      connection.query('DELETE FROM department WHERE id=? ', [deleteId], (err, res) => {
-        if (err) throw err;
-
-        console.log(res.affectedRows + ' department delete!\n');
-        menu();
-      })
-    })
-}
