@@ -49,6 +49,7 @@ function menu() {
         'Delete a Employee',
         'Update a Employee role',
         `Update a Employee manager's name`,
+        'Show Employee by department',
         'Quit'
       ]
 
@@ -88,6 +89,10 @@ function menu() {
       case `Update a Employee manager's name`:
         updateEmpManager()
         break;
+      case 'Show Employee by department':
+        showEmployeebyDepto();
+        break;
+       
       default:
         connection.end();
     }
@@ -434,6 +439,7 @@ async function deleteEmployee() {
         if (err) throw err;
 
         console.log(res.affectedRows + ' Employee deleted!\n');
+        menu();
       })
     })
 }
@@ -518,3 +524,42 @@ async function updateEmpManager() {
     })
 }
 
+async function showEmployeebyDepto() {
+  //return a list department names
+  let deptonames = await helperArray();
+  inquirer.prompt([
+
+    {
+      type: 'list',
+      name: 'ShowED',
+      message: 'Select the department for show employees!',
+      choices: deptonames
+
+    }
+  ])
+    .then(anserw => {
+      let deptoID = anserw.ShowED;
+      //sql consult delete
+
+      // emp emp.role_id  jon role con emp basado el el emp-foleid = roleid  join con dep role.depid - depid
+      connection.query('SELECT employee.id, employee.first_name, employee.last_name,role.title FROM employee LEFT JOIN role ON employee.role_id=role.id  LEFT JOIN department department on role.department_id = department.id  WHERE department.id=? ', [deptoID], (err, res) => {
+        if (err) throw err;
+      if(res.length>0){
+
+        console.log('\n')
+        console.log('** Employees by Department **')
+        console.log('\n')
+        console.table(res);
+      }
+      else
+      {
+        console.log('\n')
+        console.log('** Employees by Department **')
+        console.log('\n')
+        console.log('No employees to show for that department now')
+      }
+      
+        menu();
+      })
+    })
+}
