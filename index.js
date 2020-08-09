@@ -173,7 +173,7 @@ async function helperEmpManager() {
 //select all from department table and back a object array (department name and id)
 async function helperArray() {
   let res = await connection.query(`SELECT * FROM department `)
-  let deptoChoice = []
+  let deptoChoice = [];
 
   res.forEach(dpto => {
     //save on the list a object
@@ -225,7 +225,7 @@ function addDepartment() {
         if (err) throw err;
 
         //print the info tell the user 1 department was inserted
-        console.log(res.affectedRows + ' department inserted!\n');
+        console.log(res.affectedRows + ' Department added!\n');
 
         //call the menu for show a question again
         menu();
@@ -254,7 +254,7 @@ async function deleteApartment() {
       connection.query('DELETE FROM department WHERE id=? ', [deleteId], (err, res) => {
         if (err) throw err;
 
-        console.log(res.affectedRows + ' department delete!\n');
+        console.log(res.affectedRows + ' Department deleted!\n');
         menu();
       })
     })
@@ -310,7 +310,7 @@ async function addRole() {
       //query insert a role
       connection.query('INSERT INTO role SET title=?,salary=?,department_id=? ', [title, salary, id], (err, res) => {
         if (err) throw err;
-        console.log(res.affectedRows + ' role inserted!\n');
+        console.log(res.affectedRows + 'Role added!\n');
         menu();
       })
     })
@@ -346,9 +346,7 @@ async function deleteRole() {
 async function addEmployee() {
   let employeeNames = await helperEmpManager();
   let rolesName = await helperEmployee();
-  //console.log('nombre empleados',employeeNames);
-  //console.log('roles',rolesName);
-
+  
   inquirer.prompt([
 
     {
@@ -411,7 +409,7 @@ async function addEmployee() {
       //sql consult insert  a employee
       connection.query('INSERT INTO employee SET first_name=?,last_name=?,role_id=?,manager_id=? ', [name, last, roleIdEmp, managerId], (err, res) => {
         if (err) throw err;
-        console.log(res.affectedRows + ' employee inserted!\n');
+        console.log(res.affectedRows + ' Employee added!\n');
         menu();
       })
     })
@@ -444,15 +442,12 @@ async function deleteEmployee() {
     })
 }
 
-
 //update employee role
 async function updateEmployeeRole() {
   //call the functions back a employee names,id and roles names,id
   let employeeNames = await helperEmpManager();
   let rolesName = await helperEmployee();
-  //helperEmployee();  
-  // helperEmpManager();
-
+ 
   inquirer.prompt([
 
     {   //show a list with array employee names   
@@ -478,7 +473,7 @@ async function updateEmployeeRole() {
         if (err) throw err;
 
 
-        console.log(res.affectedRows + ' employee updated role changed!\n');
+        console.log(res.affectedRows + ' Employee updated role changed!\n');
 
         //call the menu for show a question again
         menu();
@@ -490,7 +485,7 @@ async function updateEmployeeRole() {
 
 async function updateEmpManager() {
   let namesEmpManager = await helperEmpManager();
-  //console.log(namesEmpManager)
+ 
   inquirer.prompt([
 
     {   //show a list with array employee names   
@@ -516,7 +511,7 @@ async function updateEmpManager() {
         if (err) throw err;
 
 
-        console.log(res.affectedRows + ' employee updated role changed!\n');
+        console.log(res.affectedRows + ' Employee updated manager changed!\n');
 
         //call the menu for show a question again
         menu();
@@ -524,9 +519,11 @@ async function updateEmpManager() {
     })
 }
 
+//show employees by department
 async function showEmployeebyDepto() {
   //return a list department names
   let deptonames = await helperArray();
+
   inquirer.prompt([
 
     {
@@ -539,9 +536,7 @@ async function showEmployeebyDepto() {
   ])
     .then(anserw => {
       let deptoID = anserw.ShowED;
-      //sql consult delete
-
-      // emp emp.role_id  jon role con emp basado el el emp-foleid = roleid  join con dep role.depid - depid
+      //query for select from all tables info    
       connection.query('SELECT employee.id, employee.first_name, employee.last_name,role.title FROM employee LEFT JOIN role ON employee.role_id=role.id  LEFT JOIN department department on role.department_id = department.id  WHERE department.id=? ', [deptoID], (err, res) => {
         if (err) throw err;
       if(res.length>0){
@@ -553,6 +548,7 @@ async function showEmployeebyDepto() {
       }
       else
       {
+        //if no employees for show
         console.log('\n')
         console.log('** Employees by Department **')
         console.log('\n')
