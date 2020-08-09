@@ -81,6 +81,7 @@ function menu() {
         employee.deleteEmployee();
         break;
       case 'Update a employee role':
+        updateEmployeeRole();
         break;
       default:
         connection.end();
@@ -212,16 +213,16 @@ function deleteApartment() {
     })
 }
 
-//select all from department table and back a object array
+//select all from department table and back a object array (department name and id)
 function helperArray() {
   connection.query(`SELECT * FROM department `, (err, res) => {
 
     if (err) throw err;
     res.forEach(dpto => {
-
+     //save on the list a object
       deptoChoice.push({ name: dpto.name, value: dpto.id })
     })
-    console.log('metodo', deptoChoice)
+   // console.log('metodo', deptoChoice)
     return deptoChoice;
   });
 }
@@ -286,6 +287,7 @@ function helperEmployee() {
 
     if (err) throw err;
     res.forEach(roles => {
+      //save on the list a object
       roleChoice.push({ name: roles.title, value: roles.id })
     })
    // console.log('titulo y id', roleChoice)
@@ -293,14 +295,16 @@ function helperEmployee() {
   });
 }
 
+//select first name, las name  and  id from employee table and back a object array
 function helperEmpManager() {
   connection.query(`SELECT  CONCAT(employee.first_name," " ,employee.last_name) AS fullName, employee.id FROM employee`, (err, res) => {
-    //CONCAT(manager.first_name ," ", manager.last_name)
+    
     if (err) throw err;
     res.forEach(emp => {
+      //save on the list a object
       employeName.push({ name:emp.fullName, value:emp.id})
     })
-    console.log('employee names', employeName)
+   // console.log('employee names', employeName)
     return employeName;
   });
 }
@@ -376,3 +380,44 @@ function addEmployee() {
       })
     })
 }
+
+//update employee role
+ function updateEmployeeRole(){
+   //call the functions back a employee names,id and roles names,id
+  helperEmployee();  
+  helperEmpManager();
+  
+  inquirer.prompt([
+
+    {   //show a list with array employee names   
+        type: 'list',
+        name: 'employeeName',
+        message: 'Select a employee for update name',
+        choices: employeName  
+       
+    },
+    { //show a list with the roles names
+      type: 'list',
+      name: 'selectRole',
+      message: 'Select a new role for a employee',
+      choices: roleChoice
+    }
+
+  ])
+    .then(anserw => {
+      let empName= anserw.employeeName;
+      let newrole=anserw.selectRole;
+      //query consult update role for a employee
+      connection.query('UPDATE employee SET employee.role_id= ? WHERE employee.id=?', [ newrole,empName], (err, res) => {
+        if (err) throw err;
+
+        
+        console.log(res.affectedRows + ' employee updated role changed!\n');
+
+        //call the menu for show a question again
+        menu();
+      })
+    })
+
+};
+
