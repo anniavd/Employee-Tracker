@@ -1,10 +1,11 @@
 const mysql = require('mysql2');
+const util = require('util');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 //arrays for show the info on the prompt for select choices
-let deptoChoice = [];
-let roleChoice = [];
-let employeName = [];
+//let deptoChoice = [];
+//let roleChoice = [];
+//let employeName = [];
 
 
 
@@ -25,7 +26,7 @@ connection.connect(err => {
   menu();
 });
 
-
+connection.query = util.promisify(connection.query);
 
 // show the questions 
 function menu() {
@@ -42,11 +43,10 @@ function menu() {
         'Delete a Department',
         'View all the Role',
         'Add a Role',
-        'Delete a Role',
         'View all the Employee',
         'Add a Employee',
-        'Delete a Employee',
-        'Update a employee role',
+        'Update a Employee role',
+        `Update a Employee manager's name`,
         'Quit'
       ]
 
@@ -68,20 +68,17 @@ function menu() {
       case 'Add a Role':
         addRole();
         break;
-      case 'Delete a Role':
-        role.deleteRole();
-        break;
       case 'View all the Employee':
         showEmployees();
         break;
       case 'Add a Employee':
         addEmployee();
         break;
-      case 'Delete a Employee':
-        employee.deleteEmployee();
-        break;
       case 'Update a employee role':
         updateEmployeeRole();
+        break;
+      case 'Update a employee manager name':
+        updateEmpManager()
         break;
       default:
         connection.end();
@@ -147,6 +144,46 @@ function showEmployees() {
 
 }
 
+//select first name, las name  and  id from employee table and back a object array
+async function helperEmpManager() {
+  let res = await connection.query(`SELECT  CONCAT(employee.first_name," " ,employee.last_name) AS fullName, employee.id FROM employee`)
+  let employeName = [];
+  res.forEach(emp => {
+    //save on the list a object
+    employeName.push({ name: emp.fullName, value: emp.id })
+  })
+  // console.log('employee names', employeName)
+  return employeName;
+
+}
+
+//select all from department table and back a object array (department name and id)
+async function helperArray() {
+  let res = await connection.query(`SELECT * FROM department `)
+  let deptoChoice = []
+
+  res.forEach(dpto => {
+    //save on the list a object
+    deptoChoice.push({ name: dpto.name, value: dpto.id });
+  })
+  //console.log('metodo', deptoChoice)
+  return deptoChoice;
+
+}
+
+//select title and  id from role table and back a object array
+async function helperEmployee() {
+  let res = await connection.query(`SELECT role.title,role.id FROM role `)
+  let roleChoice = [];
+
+  res.forEach(roles => {
+    //save on the list a object
+    roleChoice.push({ name: roles.title, value: roles.id })
+  })
+  // console.log('titulo y id', roleChoice)
+  return roleChoice;
+
+}
 
 
 //add a department to the datebase
@@ -183,53 +220,12 @@ function addDepartment() {
     })
 
 }
-function deleteApartment() {
 
-  inquirer.prompt([
-
-    {
-      type: 'input',
-      name: 'deptoId',
-      message: 'What is the department id ?',
-      validate: idInput => {           //validation the entry
-        if (idInput) {
-          return true;
-        } else {
-          console.log('\n Please enter the department id!');
-          return false;
-        }
-      }
-    }
-  ])
-    .then(anserw => {
-      let deleteId = anserw.deptoId;
-      //sql consult delete
-      connection.query('DELETE FROM department WHERE id=? ', [deleteId], (err, res) => {
-        if (err) throw err;
-
-        console.log(res.affectedRows + ' department delete!\n');
-        menu();
-      })
-    })
-}
-
-//select all from department table and back a object array (department name and id)
-function helperArray() {
-  connection.query(`SELECT * FROM department `, (err, res) => {
-
-    if (err) throw err;
-    res.forEach(dpto => {
-     //save on the list a object
-      deptoChoice.push({ name: dpto.name, value: dpto.id })
-    })
-   // console.log('metodo', deptoChoice)
-    return deptoChoice;
-  });
-}
 // add a role info to the date base
-function addRole() {
+async function addRole() {
   //the function back a array with all the departments name
-  helperArray();
+  let deptoChoiceRes = await helperArray();
+  console.log("choices role: ", deptoChoiceRes)
   inquirer.prompt([
     {
       type: 'input',
@@ -261,7 +257,7 @@ function addRole() {
       type: 'list',
       name: 'dptoId',
       message: 'Select the department for that rol?',
-      choices: deptoChoice
+      choices: deptoChoiceRes
 
     }
   ])
@@ -281,44 +277,19 @@ function addRole() {
     })
 }
 
-//select title and  id from role table and back a object array
-function helperEmployee() {
-  connection.query(`SELECT role.title,role.id FROM role `, (err, res) => {
-
-    if (err) throw err;
-    res.forEach(roles => {
-      //save on the list a object
-      roleChoice.push({ name: roles.title, value: roles.id })
-    })
-   // console.log('titulo y id', roleChoice)
-    return roleChoice;
-  });
-}
-
-//select first name, las name  and  id from employee table and back a object array
-function helperEmpManager() {
-  connection.query(`SELECT  CONCAT(employee.first_name," " ,employee.last_name) AS fullName, employee.id FROM employee`, (err, res) => {
-    
-    if (err) throw err;
-    res.forEach(emp => {
-      //save on the list a object
-      employeName.push({ name:emp.fullName, value:emp.id})
-    })
-   // console.log('employee names', employeName)
-    return employeName;
-  });
-}
-
 //add a employe to the date base
-function addEmployee() {
-  helperEmployee();
-  helperEmpManager();
+async function addEmployee() {
+  let employeeNames = await helperEmpManager();
+  let rolesName = await helperEmployee();
+  //console.log('nombre empleados',employeeNames);
+  //console.log('roles',rolesName);
+
   inquirer.prompt([
 
     {
       type: 'input',
       name: 'name',
-      message: 'What is the employee\ manager name?',
+      message: 'What is the employee name?',
       validate: name => {           //validation the entry
         if (name) {
           return true;
@@ -345,7 +316,7 @@ function addEmployee() {
       type: 'list',
       name: 'selectRole',
       message: 'Select a role for a employee',
-      choices: roleChoice
+      choices: rolesName
     },
     // Table of Contents
     {
@@ -359,9 +330,9 @@ function addEmployee() {
       type: 'list',
       name: 'magId',
       message: 'Have a manager?',
-      choices: employeName,
-     when: ({ confirmManager }) => confirmManager
-    }  
+      choices: employeeNames,
+      when: ({ confirmManager }) => confirmManager
+    }
 
   ])
     .then(anserw => {
@@ -382,36 +353,38 @@ function addEmployee() {
 }
 
 //update employee role
- function updateEmployeeRole(){
-   //call the functions back a employee names,id and roles names,id
-  helperEmployee();  
-  helperEmpManager();
-  
+async function updateEmployeeRole() {
+  //call the functions back a employee names,id and roles names,id
+  let employeeNames = await helperEmpManager();
+  let rolesName = await helperEmployee();
+  //helperEmployee();  
+  // helperEmpManager();
+
   inquirer.prompt([
 
     {   //show a list with array employee names   
-        type: 'list',
-        name: 'employeeName',
-        message: 'Select a employee for update name',
-        choices: employeName  
-       
+      type: 'list',
+      name: 'employeeName',
+      message: 'Select a employee for update his role',
+      choices: employeeNames
+
     },
     { //show a list with the roles names
       type: 'list',
       name: 'selectRole',
       message: 'Select a new role for a employee',
-      choices: roleChoice
+      choices: rolesName
     }
 
   ])
     .then(anserw => {
-      let empName= anserw.employeeName;
-      let newrole=anserw.selectRole;
+      let empName = anserw.employeeName;
+      let newrole = anserw.selectRole;
       //query consult update role for a employee
-      connection.query('UPDATE employee SET employee.role_id= ? WHERE employee.id=?', [ newrole,empName], (err, res) => {
+      connection.query('UPDATE employee SET employee.role_id= ? WHERE employee.id=?', [newrole, empName], (err, res) => {
         if (err) throw err;
 
-        
+
         console.log(res.affectedRows + ' employee updated role changed!\n');
 
         //call the menu for show a question again
@@ -421,3 +394,64 @@ function addEmployee() {
 
 };
 
+
+async function updateEmpManager() {
+  let namesEmpManager = await helperEmpManager();
+  //console.log(namesEmpManager)
+  inquirer.prompt([
+
+    {   //show a list with array employee names   
+      type: 'list',
+      name: 'employee',
+      message: 'Select a employee for update his manager',
+      choices: namesEmpManager
+
+    },
+    { //show a list with the roles names
+      type: 'list',
+      name: 'manager',
+      message: 'Select a manager name',
+      choices: namesEmpManager
+    }
+
+  ])
+    .then(anserw => {
+      let empName = anserw.employee;
+      let newManager = anserw.manager;
+      //query consult update role for a employee
+      connection.query('UPDATE employee SET employee.manager_id= ? WHERE employee.id=?', [newManager, empName], (err, res) => {
+        if (err) throw err;
+
+
+        console.log(res.affectedRows + ' employee updated role changed!\n');
+
+        //call the menu for show a question again
+        menu();
+      })
+    })
+}
+
+async function deleteApartment() {
+  //return a list department names
+  let roleNames = await helperArray();
+  inquirer.prompt([
+
+    {
+      type: 'list',
+      name: 'dptoDelete',
+      message: 'Select the department for delete!',
+      choices: roleNames
+
+    }
+  ])
+    .then(anserw => {
+      let deleteId = anserw.dptoDelete;
+      //sql consult delete
+      connection.query('DELETE FROM department WHERE id=? ', [deleteId], (err, res) => {
+        if (err) throw err;
+
+        console.log(res.affectedRows + ' department delete!\n');
+        menu();
+      })
+    })
+}
