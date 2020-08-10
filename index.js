@@ -2,12 +2,6 @@ const mysql = require('mysql2');
 const util = require('util');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-//arrays for show the info on the prompt for select choices
-//let deptoChoice = [];
-//let roleChoice = [];
-//let employeName = [];
-
-
 
 
 const connection = mysql.createConnection({
@@ -165,7 +159,7 @@ async function helperEmpManager() {
     //save on the list a object
     employeName.push({ name: emp.fullName, value: emp.id })
   })
-  // console.log('employee names', employeName)
+
   return employeName;
 
 }
@@ -179,7 +173,7 @@ async function helperArray() {
     //save on the list a object
     deptoChoice.push({ name: dpto.name, value: dpto.id });
   })
-  //console.log('metodo', deptoChoice)
+  
   return deptoChoice;
 
 }
@@ -193,7 +187,7 @@ async function helperEmployee() {
     //save on the list a object
     roleChoice.push({ name: roles.title, value: roles.id })
   })
-  // console.log('titulo y id', roleChoice)
+  
   return roleChoice;
 
 }
@@ -264,7 +258,7 @@ async function deleteApartment() {
 async function addRole() {
   //the function back a array with all the departments name
   let deptoChoiceRes = await helperArray();
-  console.log("choices role: ", deptoChoiceRes)
+ 
   inquirer.prompt([
     {
       type: 'input',
@@ -304,9 +298,7 @@ async function addRole() {
       let title = anserw.title;
       let salary = anserw.salary;
       let id = anserw.dptoId;
-      console.log('ID', id)
-
-
+     
       //query insert a role
       connection.query('INSERT INTO role SET title=?,salary=?,department_id=? ', [title, salary, id], (err, res) => {
         if (err) throw err;

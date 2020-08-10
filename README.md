@@ -11,6 +11,9 @@ where the information is shown organized.The business owner may add and remove e
 roles and departments, as well as update the role or manager of the employees.
   
  
+  ### You can find an explanatory video about the app.
+
+ [link to the app video](https://drive.google.com/file/d/1Xt9lxetykCHk-qo2YJ7KEtjggfDTe8Ne)
 
 # License
 The license for which the application is covered:
