@@ -28,6 +28,7 @@ roles and departments, as well as update the role or manager of the employees.
 - Run the line command `npm install` for dependencies to be installed.
 - Open the file index.js and write in connection your  `user: ''` and 
  ` password: ''`.
+ - On the console run the line command `mysql -u root -p`for connect to your Database.
 
 # Usage
 > - You can find an explanatory video about how use the app,clicking below.
